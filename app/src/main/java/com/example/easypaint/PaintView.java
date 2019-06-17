@@ -18,18 +18,27 @@ import java.util.ArrayList;
 
 public class PaintView extends View {
 
-    public static int BRUSH_SIZE = 20;
-    public static final int DEFAULT_COLOR = Color.RED;
-    public static final int DEFAULT_BG_COLOR = Color.WHITE;
-    private static final float TOUCH_TOLERENCE = 4;
+    //    Default size of the brush stroke in pixels
+    private final int DEFAULT_BRUSH_SIZE = 20;
+    private final int DEFAULT_STROKE_COLOR = Color.RED;
+    private final int DEFAULT_BACKGROUND_COLOR = Color.WHITE;
+    private final Paint.Style DEFAULT_STROKE_STYLE = Paint.Style.STROKE;
+    private final Paint.Cap DEFAULT_BRUSH_CAP = Paint.Cap.ROUND;
+
+    //    Minimum pixels to be moved for touch to be registered
+    private static final float TOUCH_TOLERANCE = 0;
     private float mX, mY;
+
     private Path mPath;
     private Paint mPaint;
     private ArrayList<FingerPath> paths = new ArrayList<>();
-    private int currentColor;
-    private int backgroundColor = DEFAULT_BG_COLOR;
-    private int strokeWidth;
+    private int strokeColor = DEFAULT_STROKE_COLOR;
+    private int backgroundColor = DEFAULT_BACKGROUND_COLOR;
+    private int strokeWidth = DEFAULT_BRUSH_SIZE;
+    private Paint.Style strokeStyle = DEFAULT_STROKE_STYLE;
+    private Paint.Cap capStyle = DEFAULT_BRUSH_CAP;
     private boolean emboss;
+
     private boolean blur;
     private MaskFilter mEmboss;
     private MaskFilter mBlur;
@@ -37,6 +46,11 @@ public class PaintView extends View {
     private Canvas mCanvas;
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
+    onViewTouchedListener listener;
+
+    public interface onViewTouchedListener {
+        void onPaintWindowTouch();
+    }
 
     public PaintView(Context context) {
         this(context, null);
@@ -44,18 +58,23 @@ public class PaintView extends View {
 
     public PaintView(Context context, AttributeSet attrs) {
         super(context, attrs);
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(DEFAULT_COLOR);
-        mPaint.setStyle(Paint.Style.STROKE);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
-        mPaint.setStrokeCap(Paint.Cap.ROUND);
-        mPaint.setXfermode(null);
-        mPaint.setAlpha(0xff);
+
 
         mEmboss = new EmbossMaskFilter(new float[]{1, 1, 1}, 0.4f, 6, 3.5f);
         mBlur = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
+    }
+
+    public void initPaint() {
+        mPaint = new Paint();
+        mPaint.setAntiAlias(true);
+        mPaint.setDither(true);
+        mPaint.setColor(DEFAULT_STROKE_COLOR);
+        mPaint.setStyle(strokeStyle);
+        mPaint.setStrokeJoin(Paint.Join.ROUND);
+
+        mPaint.setStrokeCap(capStyle);
+        mPaint.setXfermode(null);
+        mPaint.setAlpha(0xff);
     }
 
     public void init(DisplayMetrics metrics) {
@@ -66,8 +85,14 @@ public class PaintView extends View {
         mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         mCanvas = new Canvas(mBitmap);
 
-        currentColor = DEFAULT_COLOR;
-        strokeWidth = BRUSH_SIZE;
+        listener = (onViewTouchedListener) getContext();
+
+        strokeColor = DEFAULT_STROKE_COLOR;
+        strokeWidth = DEFAULT_BRUSH_SIZE;
+
+        initPaint();
+
+
     }
 
     public void normal() {
@@ -86,7 +111,7 @@ public class PaintView extends View {
     }
 
     public void clear() {
-        backgroundColor = DEFAULT_BG_COLOR;
+//        backgroundColor = DEFAULT_BACKGROUND_COLOR;
         paths.clear();
         normal();
         invalidate();
@@ -117,7 +142,7 @@ public class PaintView extends View {
 
     private void touchStart(float x, float y) {
         mPath = new Path();
-        FingerPath fp = new FingerPath(currentColor, emboss, blur, strokeWidth, mPath);
+        FingerPath fp = new FingerPath(strokeColor, emboss, blur, strokeWidth, mPath);
         paths.add(fp);
 
         mPath.reset();
@@ -130,7 +155,7 @@ public class PaintView extends View {
         float dx = Math.abs(x - mX);
         float dy = Math.abs(y - mY);
 
-        if (dx >= TOUCH_TOLERENCE || dy >= TOUCH_TOLERENCE) {
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
             mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
             mX = x;
             mY = y;
@@ -143,6 +168,8 @@ public class PaintView extends View {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
+        listener.onPaintWindowTouch();
+
         float x = event.getX();
         float y = event.getY();
 
@@ -162,5 +189,40 @@ public class PaintView extends View {
         }
 
         return true;
+    }
+
+    public void setStrokeColor(int color) {
+        this.strokeColor = color;
+    }
+
+    @Override
+    public void setBackgroundColor(int backgroundColor) {
+        this.backgroundColor = backgroundColor;
+        invalidate();
+    }
+
+    public Paint getPaint() {
+        return mPaint;
+    }
+
+    public void setPaint(Paint mPaint) {
+        this.mPaint = mPaint;
+    }
+
+    public int getStrokeColor() {
+        return strokeColor;
+    }
+
+    public int getBackgroundColor() {
+        return backgroundColor;
+    }
+
+    public void setStrokeWidth(int strokeWidth) {
+        this.strokeWidth = strokeWidth;
+    }
+
+    public void setCapStyle(Paint.Cap capStyle) {
+        this.capStyle = capStyle;
+        initPaint();
     }
 }

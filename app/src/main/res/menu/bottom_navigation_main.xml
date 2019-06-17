@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_draw_mode"
+        android:enabled="true"
+        android:icon="@drawable/draw_mode"
+        android:title="Draw Mode"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_stroke_style"
+        android:enabled="true"
+        android:icon="@drawable/stroke_style"
+        android:title="Stroke Style"
+        app:showAsAction="always" />
+    <item
+        android:id="@+id/action_stroke_color"
+        android:enabled="true"
+        android:icon="@drawable/stroke_color"
+        android:title="Stroke Color"
+        app:showAsAction="ifRoom" />
+
+    <item
+        android:id="@+id/action_background_color"
+        android:enabled="true"
+        android:icon="@drawable/background_color"
+        android:title="Background Color"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_eraser"
+        android:enabled="true"
+        android:icon="@drawable/eraser"
+        android:title="Eraser"
+        app:showAsAction="always" />
+
+</menu>
