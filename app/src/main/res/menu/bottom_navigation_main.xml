@@ -26,7 +26,7 @@
         android:id="@+id/action_background_color"
         android:enabled="true"
         android:icon="@drawable/background_color"
-        android:title="Background"
+        android:title="Canvas"
         app:showAsAction="always" />
 
     <item
