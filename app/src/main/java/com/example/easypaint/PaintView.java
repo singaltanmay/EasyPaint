@@ -14,6 +14,8 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
 
 public class PaintView extends View {
@@ -29,8 +31,8 @@ public class PaintView extends View {
     private static final float TOUCH_TOLERANCE = 0;
     private float mX, mY;
 
-    private Path mPath;
-    private Paint mPaint;
+    private Path brushPath;
+    private Paint brushPaint;
     private ArrayList<FingerPath> paths = new ArrayList<>();
     private int strokeColor = DEFAULT_STROKE_COLOR;
     private int backgroundColor = DEFAULT_BACKGROUND_COLOR;
@@ -42,9 +44,19 @@ public class PaintView extends View {
     private boolean blur;
     private MaskFilter mEmboss;
     private MaskFilter mBlur;
-    private Bitmap mBitmap;
+    private Bitmap backgroundBitmap;
     private Canvas mCanvas;
+
+
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
+
+    private ArrayList<Sticker> allStickers = new ArrayList<>();
+
+    public void addSticker(Bitmap bitmap) {
+        Sticker sticker = new Sticker(bitmap);
+
+        allStickers.add(sticker);
+    }
 
     onViewTouchedListener listener;
 
@@ -59,31 +71,29 @@ public class PaintView extends View {
     public PaintView(Context context, AttributeSet attrs) {
         super(context, attrs);
 
-
         mEmboss = new EmbossMaskFilter(new float[]{1, 1, 1}, 0.4f, 6, 3.5f);
         mBlur = new BlurMaskFilter(5, BlurMaskFilter.Blur.NORMAL);
     }
 
     public void initPaint() {
-        mPaint = new Paint();
-        mPaint.setAntiAlias(true);
-        mPaint.setDither(true);
-        mPaint.setColor(DEFAULT_STROKE_COLOR);
-        mPaint.setStyle(strokeStyle);
-        mPaint.setStrokeJoin(Paint.Join.ROUND);
+        brushPaint = new Paint();
+        brushPaint.setAntiAlias(true);
+        brushPaint.setDither(true);
+        brushPaint.setColor(DEFAULT_STROKE_COLOR);
+        brushPaint.setStyle(strokeStyle);
+        brushPaint.setStrokeJoin(Paint.Join.ROUND);
 
-        mPaint.setStrokeCap(capStyle);
-        mPaint.setXfermode(null);
-        mPaint.setAlpha(0xff);
+        brushPaint.setStrokeCap(capStyle);
+        brushPaint.setXfermode(null);
+        brushPaint.setAlpha(0xff);
     }
 
     public void init(DisplayMetrics metrics) {
         int height = metrics.heightPixels;
         int width = metrics.widthPixels;
 
-
-        mBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        mCanvas = new Canvas(mBitmap);
+        backgroundBitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        mCanvas = new Canvas(backgroundBitmap);
 
         listener = (onViewTouchedListener) getContext();
 
@@ -93,6 +103,98 @@ public class PaintView extends View {
         initPaint();
 
 
+    }
+
+    @Override
+    protected void onDraw(Canvas canvas) {
+        canvas.save();
+        mCanvas.drawColor(backgroundColor);
+
+        for (FingerPath fp : paths) {
+            brushPaint.setColor(fp.color);
+            brushPaint.setStrokeWidth(fp.strokeWidth);
+            brushPaint.setMaskFilter(null);
+
+            if (fp.emboss) {
+                brushPaint.setMaskFilter(mEmboss);
+            } else if (fp.blur) {
+                brushPaint.setMaskFilter(mBlur);
+            }
+
+            mCanvas.drawPath(fp.path, brushPaint);
+        }
+
+//        if (importedBitmap != null) {
+////            canvas.drawBitmap(importedBitmap, 0, 0, mBitmapPaint);
+////        }
+
+
+        for (Sticker sticker : allStickers) {
+            sticker.draw(canvas);
+        }
+
+        canvas.drawBitmap(backgroundBitmap, 0, 0, mBitmapPaint);
+
+        canvas.restore();
+    }
+
+    private void touchStart(float x, float y) {
+        brushPath = new Path();
+        FingerPath fp = new FingerPath(strokeColor, emboss, blur, strokeWidth, brushPath);
+        paths.add(fp);
+
+        brushPath.reset();
+        brushPath.moveTo(x, y);
+        mX = x;
+        mY = y;
+    }
+
+    private void touchMove(float x, float y) {
+        float dx = Math.abs(x - mX);
+        float dy = Math.abs(y - mY);
+
+        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
+            brushPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
+            mX = x;
+            mY = y;
+        }
+    }
+
+    private void touchUp() {
+        brushPath.lineTo(mX, mY);
+    }
+
+    @Override
+    public boolean onTouchEvent(MotionEvent event) {
+        listener.onPaintWindowTouch();
+
+        for (Sticker sticker : allStickers) {
+            sticker.handleOnTouchEvent(event);
+        }
+
+        float x = event.getX();
+        float y = event.getY();
+
+        switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN:
+                touchStart(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_MOVE:
+                touchMove(x, y);
+                invalidate();
+                break;
+            case MotionEvent.ACTION_UP:
+                touchUp();
+                invalidate();
+                break;
+        }
+
+        return true;
+    }
+
+    public Bitmap exportCanvas() {
+        return backgroundBitmap;
     }
 
     public void normal() {
@@ -117,80 +219,6 @@ public class PaintView extends View {
         invalidate();
     }
 
-    @Override
-    protected void onDraw(Canvas canvas) {
-        canvas.save();
-        mCanvas.drawColor(backgroundColor);
-
-        for (FingerPath fp : paths) {
-            mPaint.setColor(fp.color);
-            mPaint.setStrokeWidth(fp.strokeWidth);
-            mPaint.setMaskFilter(null);
-
-            if (fp.emboss) {
-                mPaint.setMaskFilter(mEmboss);
-            } else if (fp.blur) {
-                mPaint.setMaskFilter(mBlur);
-            }
-
-            mCanvas.drawPath(fp.path, mPaint);
-        }
-
-        canvas.drawBitmap(mBitmap, 0, 0, mBitmapPaint);
-        canvas.restore();
-    }
-
-    private void touchStart(float x, float y) {
-        mPath = new Path();
-        FingerPath fp = new FingerPath(strokeColor, emboss, blur, strokeWidth, mPath);
-        paths.add(fp);
-
-        mPath.reset();
-        mPath.moveTo(x, y);
-        mX = x;
-        mY = y;
-    }
-
-    private void touchMove(float x, float y) {
-        float dx = Math.abs(x - mX);
-        float dy = Math.abs(y - mY);
-
-        if (dx >= TOUCH_TOLERANCE || dy >= TOUCH_TOLERANCE) {
-            mPath.quadTo(mX, mY, (x + mX) / 2, (y + mY) / 2);
-            mX = x;
-            mY = y;
-        }
-    }
-
-    private void touchUp() {
-        mPath.lineTo(mX, mY);
-    }
-
-    @Override
-    public boolean onTouchEvent(MotionEvent event) {
-        listener.onPaintWindowTouch();
-
-        float x = event.getX();
-        float y = event.getY();
-
-        switch (event.getAction()) {
-            case MotionEvent.ACTION_DOWN:
-                touchStart(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_MOVE:
-                touchMove(x, y);
-                invalidate();
-                break;
-            case MotionEvent.ACTION_UP:
-                touchUp();
-                invalidate();
-                break;
-        }
-
-        return true;
-    }
-
     public void setStrokeColor(int color) {
         this.strokeColor = color;
     }
@@ -202,11 +230,12 @@ public class PaintView extends View {
     }
 
     public Paint getPaint() {
-        return mPaint;
+        return brushPaint;
     }
 
     public void setPaint(Paint mPaint) {
-        this.mPaint = mPaint;
+        this.brushPaint = mPaint;
+        invalidate();
     }
 
     public int getStrokeColor() {
@@ -224,5 +253,21 @@ public class PaintView extends View {
     public void setCapStyle(Paint.Cap capStyle) {
         this.capStyle = capStyle;
         initPaint();
+    }
+
+    public boolean isEmboss() {
+        return emboss;
+    }
+
+    public boolean isBlur() {
+        return blur;
+    }
+
+    public void setEmboss(boolean emboss) {
+        this.emboss = emboss;
+    }
+
+    public void setBlur(boolean blur) {
+        this.blur = blur;
     }
 }

@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/action_share_canvas"
+        android:icon="@drawable/share"
+        android:title="Share"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_save_canvas"
+        android:icon="@drawable/save"
+        android:title="Save"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_import_bitmap"
+        android:icon="@drawable/image"
+        android:title="Import"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_clear_screen"
+        android:icon="@drawable/clear_all"
+        android:title="Clear"
+        app:showAsAction="always" />
+
+</menu>

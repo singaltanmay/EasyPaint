@@ -6,14 +6,36 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/top_action_bar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@color/colorPrimary"
+        android:elevation="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginTop="0dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/top_action_bar" />
+
     <com.example.easypaint.PaintView
         android:id="@+id/paintView"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
+        android:layout_marginTop="0dp"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/top_action_bar" />
 
     <LinearLayout
         android:id="@+id/linearLayout"
@@ -38,6 +60,7 @@
             android:id="@+id/stroke_style_config_panel"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:background="@color/colorPrimaryLight"
             android:orientation="vertical"
             android:padding="16dp"
             android:visibility="gone">
@@ -47,11 +70,11 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Brush Mode : "
-                app:layout_constraintBottom_toTopOf="@+id/radioGroup"
+                app:layout_constraintBottom_toTopOf="@+id/brushModeRadioGroup"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <RadioGroup
-                android:id="@+id/radioGroup"
+                android:id="@+id/brushModeRadioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
@@ -60,18 +83,21 @@
                 tools:layout_editor_absoluteY="44dp">
 
                 <RadioButton
+                    android:id="@+id/radioButtonStrokeNormal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Normal" />
 
                 <RadioButton
+                    android:id="@+id/radioButtonStrokeEmboss"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Emboss" />
 
                 <RadioButton
+                    android:id="@+id/radioButtonStrokeBlur"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
@@ -84,23 +110,23 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
                 android:text="Brush Size : "
-                app:layout_constraintBottom_toTopOf="@+id/seekBar"
+                app:layout_constraintBottom_toTopOf="@+id/brushSizeSeekBar"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <SeekBar
-                android:id="@+id/seekBar"
+                android:id="@+id/brushSizeSeekBar"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
                 android:layout_marginBottom="8dp"
                 android:max="200"
-                android:min="20"
+                android:progress="20"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/textView"
+                app:layout_constraintEnd_toStartOf="@+id/brushSizeSeekedValue"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <TextView
-                android:id="@+id/textView"
+                android:id="@+id/brushSizeSeekedValue"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
@@ -117,7 +143,8 @@
             android:id="@+id/bottom_navigation_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            app:itemBackground="@android:color/white"
+            android:elevation="16dp"
+            app:itemBackground="@color/colorPrimary"
             app:itemIconTint="@android:color/black"
             app:itemTextColor="@android:color/black"
             app:menu="@menu/bottom_navigation_main" />
