@@ -3,6 +3,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/action_undo"
+        android:icon="@drawable/undo"
+        android:title="Undo"
+        app:showAsAction="always" />
+
+    <item
+        android:id="@+id/action_redo"
+        android:icon="@drawable/redo"
+        android:title="Undo"
+        app:showAsAction="always" />
+
+    <item
         android:id="@+id/action_share_canvas"
         android:icon="@drawable/share"
         android:title="Share"

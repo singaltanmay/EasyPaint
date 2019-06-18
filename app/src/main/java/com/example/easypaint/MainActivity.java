@@ -89,11 +89,24 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
             public boolean onMenuItemClick(MenuItem item) {
                 switch (item.getItemId()) {
 
+                    case R.id.action_undo:
+                        if (!paintView.undoPath()){
+                            Toast.makeText(MainActivity.this, "Undo not possible", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+
+
+                    case R.id.action_redo:
+                        if (!paintView.redoPath()){
+                            Toast.makeText(MainActivity.this, "Redo not possible", Toast.LENGTH_SHORT).show();
+                        }
+                        break;
+
                     case R.id.action_share_canvas:
                         Bitmap bitmap1 = paintView.exportCanvas();
                         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                             if (!(checkIfAlreadyHavePermission())) {
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 3);
                             } else sendImageViaIntent(bitmap1);
                         } else sendImageViaIntent(bitmap1);
                         break;
@@ -102,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
                         Bitmap bitmap = paintView.exportCanvas();
                         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                             if (!(checkIfAlreadyHavePermission())) {
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 2);
                             } else saveImageExternal(bitmap);
                         } else saveImageExternal(bitmap);
 
@@ -112,7 +125,7 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
                     case R.id.action_import_bitmap:
                         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
                             if (!(checkIfAlreadyHavePermission())) {
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
                             } else importImageFromGallery();
                         } else importImageFromGallery();
 
@@ -221,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
             } else {
                 Toast.makeText(this, "Permission is required to save image", Toast.LENGTH_SHORT).show();
             }
-        }else if (requestCode == 3) {
+        } else if (requestCode == 3) {
             if (grantResults.length > 0
                     && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 sendImageViaIntent(paintView.exportCanvas());

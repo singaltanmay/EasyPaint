@@ -14,9 +14,8 @@ import android.util.DisplayMetrics;
 import android.view.MotionEvent;
 import android.view.View;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Stack;
 
 public class PaintView extends View {
 
@@ -33,7 +32,8 @@ public class PaintView extends View {
 
     private Path brushPath;
     private Paint brushPaint;
-    private ArrayList<FingerPath> paths = new ArrayList<>();
+    private Stack<FingerPath> pathHistory = new Stack<>();
+    private Stack<FingerPath> pathFuture = new Stack<>();
     private int strokeColor = DEFAULT_STROKE_COLOR;
     private int backgroundColor = DEFAULT_BACKGROUND_COLOR;
     private int strokeWidth = DEFAULT_BRUSH_SIZE;
@@ -46,7 +46,6 @@ public class PaintView extends View {
     private MaskFilter mBlur;
     private Bitmap backgroundBitmap;
     private Canvas mCanvas;
-
 
     private Paint mBitmapPaint = new Paint(Paint.DITHER_FLAG);
 
@@ -101,8 +100,6 @@ public class PaintView extends View {
         strokeWidth = DEFAULT_BRUSH_SIZE;
 
         initPaint();
-
-
     }
 
     @Override
@@ -110,7 +107,7 @@ public class PaintView extends View {
         canvas.save();
         mCanvas.drawColor(backgroundColor);
 
-        for (FingerPath fp : paths) {
+        for (FingerPath fp : pathHistory) {
             brushPaint.setColor(fp.color);
             brushPaint.setStrokeWidth(fp.strokeWidth);
             brushPaint.setMaskFilter(null);
@@ -141,7 +138,10 @@ public class PaintView extends View {
     private void touchStart(float x, float y) {
         brushPath = new Path();
         FingerPath fp = new FingerPath(strokeColor, emboss, blur, strokeWidth, brushPath);
-        paths.add(fp);
+        if (!pathFuture.isEmpty() && !pathFuture.peek().equals(fp)) {
+            pathFuture = new Stack<>();
+        }
+        pathHistory.push(fp);
 
         brushPath.reset();
         brushPath.moveTo(x, y);
@@ -214,7 +214,7 @@ public class PaintView extends View {
 
     public void clear() {
 //        backgroundColor = DEFAULT_BACKGROUND_COLOR;
-        paths.clear();
+        pathHistory.clear();
         normal();
         invalidate();
     }
@@ -253,6 +253,24 @@ public class PaintView extends View {
     public void setCapStyle(Paint.Cap capStyle) {
         this.capStyle = capStyle;
         initPaint();
+    }
+
+    public boolean undoPath() {
+        if (pathHistory.isEmpty()) {
+            return false;
+        }
+        pathFuture.push(pathHistory.pop());
+        invalidate();
+        return true;
+    }
+
+    public boolean redoPath() {
+        if (pathFuture.isEmpty()) {
+            return false;
+        }
+        pathHistory.push(pathFuture.pop());
+        invalidate();
+        return true;
     }
 
     public boolean isEmboss() {
