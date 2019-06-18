@@ -16,17 +16,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView"
-        android:layout_width="wrap_content"
-        android:layout_height="0dp"
-        android:layout_marginTop="0dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/top_action_bar" />
-
     <com.example.easypaint.PaintView
         android:id="@+id/paintView"
         android:layout_width="wrap_content"
@@ -50,7 +39,9 @@
             android:id="@+id/colorPickerRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
+            android:background="@color/colorPrimaryLight"
+            android:paddingTop="4dp"
+            android:paddingBottom="4dp"
             android:visibility="gone"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="@+id/paintView"
@@ -69,35 +60,76 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
-                android:text="Brush Mode : "
-                app:layout_constraintBottom_toTopOf="@+id/brushModeRadioGroup"
+                android:text="Brush Tip : "
+                app:layout_constraintBottom_toTopOf="@+id/brushTipRadioGroup"
                 app:layout_constraintStart_toStartOf="parent" />
 
             <RadioGroup
-                android:id="@+id/brushModeRadioGroup"
+                android:id="@+id/brushTipRadioGroup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
                 android:orientation="horizontal"
-                app:layout_constraintBottom_toTopOf="@+id/db3894"
-                app:layout_constraintStart_toStartOf="parent"
-                tools:layout_editor_absoluteY="44dp">
+                app:layout_constraintBottom_toTopOf="@+id/sa546d7f89"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <RadioButton
-                    android:id="@+id/radioButtonStrokeNormal"
+                    android:id="@+id/radioButtonTipRound"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Round" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonTipFlat"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Flat" />
+
+                <RadioButton
+                    android:id="@+id/radioButtonTipSquare"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="Square" />
+            </RadioGroup>
+
+            <TextView
+                android:id="@+id/sa546d7f89"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Brush Effect : "
+                app:layout_constraintBottom_toTopOf="@+id/brushEffectRadioGroup"
+                app:layout_constraintStart_toStartOf="parent" />
+
+            <RadioGroup
+                android:id="@+id/brushEffectRadioGroup"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:orientation="horizontal"
+                app:layout_constraintBottom_toTopOf="@+id/db3894"
+                app:layout_constraintStart_toStartOf="parent">
+
+                <RadioButton
+                    android:id="@+id/radioButtonEffectNormal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Normal" />
 
                 <RadioButton
-                    android:id="@+id/radioButtonStrokeEmboss"
+                    android:id="@+id/radioButtonEffectEmboss"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:text="Emboss" />
 
                 <RadioButton
-                    android:id="@+id/radioButtonStrokeBlur"
+                    android:id="@+id/radioButtonEffectBlur"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"

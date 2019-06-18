@@ -31,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.SeekBar;
 import android.widget.TextView;
@@ -90,14 +91,14 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
                 switch (item.getItemId()) {
 
                     case R.id.action_undo:
-                        if (!paintView.undoPath()){
+                        if (!paintView.undoPath()) {
                             Toast.makeText(MainActivity.this, "Undo not possible", Toast.LENGTH_SHORT).show();
                         }
                         break;
 
 
                     case R.id.action_redo:
-                        if (!paintView.redoPath()){
+                        if (!paintView.redoPath()) {
                             Toast.makeText(MainActivity.this, "Redo not possible", Toast.LENGTH_SHORT).show();
                         }
                         break;
@@ -122,14 +123,14 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
 
                         break;
 
-                    case R.id.action_import_bitmap:
-                        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
-                            if (!(checkIfAlreadyHavePermission())) {
-                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
-                            } else importImageFromGallery();
-                        } else importImageFromGallery();
-
-                        break;
+//                    case R.id.action_import_bitmap:
+//                        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.LOLLIPOP_MR1) {
+//                            if (!(checkIfAlreadyHavePermission())) {
+//                                ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
+//                            } else importImageFromGallery();
+//                        } else importImageFromGallery();
+//
+//                        break;
 
                     case R.id.action_clear_screen:
                         paintView.clear();
@@ -320,26 +321,57 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
 
     private void initStrokeStylePanel() {
 
-        RadioGroup group = findViewById(R.id.brushModeRadioGroup);
-        if (paintView.isEmboss()) {
-            group.check(R.id.radioButtonStrokeEmboss);
-        } else if (paintView.isBlur()) {
-            group.check(R.id.radioButtonStrokeBlur);
-        } else {
-            group.check(R.id.radioButtonStrokeNormal);
+        RadioGroup tipChoice = findViewById(R.id.brushTipRadioGroup);
+
+        switch (paintView.getCapStyle()) {
+            case ROUND:
+                tipChoice.check(R.id.radioButtonTipRound);
+                break;
+            case BUTT:
+                tipChoice.check(R.id.radioButtonTipFlat);
+                break;
+            case SQUARE:
+                tipChoice.check(R.id.radioButtonTipSquare);
+                break;
         }
 
-        group.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+        tipChoice.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(RadioGroup radioGroup, int i) {
                 switch (radioGroup.getCheckedRadioButtonId()) {
-                    case R.id.radioButtonStrokeNormal:
+                    case R.id.radioButtonTipRound:
+                        paintView.setCapStyle(Paint.Cap.ROUND);
+                        break;
+                    case R.id.radioButtonTipFlat:
+                        paintView.setCapStyle(Paint.Cap.BUTT);
+                        break;
+                    case R.id.radioButtonTipSquare:
+                        paintView.setCapStyle(Paint.Cap.SQUARE);
+                        break;
+                }
+            }
+        });
+
+        RadioGroup effectChoice = findViewById(R.id.brushEffectRadioGroup);
+        if (paintView.isEmboss()) {
+            effectChoice.check(R.id.radioButtonEffectEmboss);
+        } else if (paintView.isBlur()) {
+            effectChoice.check(R.id.radioButtonEffectBlur);
+        } else {
+            effectChoice.check(R.id.radioButtonEffectNormal);
+        }
+
+        effectChoice.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(RadioGroup radioGroup, int i) {
+                switch (radioGroup.getCheckedRadioButtonId()) {
+                    case R.id.radioButtonEffectNormal:
                         paintView.normal();
                         break;
-                    case R.id.radioButtonStrokeEmboss:
+                    case R.id.radioButtonEffectEmboss:
                         paintView.emboss();
                         break;
-                    case R.id.radioButtonStrokeBlur:
+                    case R.id.radioButtonEffectBlur:
                         paintView.blur();
                         break;
                     default:
@@ -490,7 +522,13 @@ public class MainActivity extends AppCompatActivity implements PaintView.onViewT
         @Override
         public void onBindViewHolder(final ColorPickerAdapter.MyViewHolder holder, int position) {
             final FloatingActionButton colorButton = (FloatingActionButton) holder.view;
-            colorButton.setBackgroundTintList(ColorStateList.valueOf(mDataset.get(position)));
+            int color = mDataset.get(position);
+            if (currentMode == STROKE_COLOR_MODE && paintView.getStrokeColor() == color) {
+                colorButton.setCustomSize(36);
+            } else if (currentMode == BACKGROUND_PICKER_MODE && paintView.getBackgroundColor() == color) {
+                colorButton.setCustomSize(FloatingActionButton.SIZE_NORMAL);
+            }
+            colorButton.setBackgroundTintList(ColorStateList.valueOf(color));
             colorButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

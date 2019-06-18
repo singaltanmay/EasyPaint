@@ -6,27 +6,27 @@
         android:id="@+id/action_draw_mode"
         android:enabled="true"
         android:icon="@drawable/draw_mode"
-        android:title="Draw Mode"
+        android:title="Draw"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/action_stroke_style"
         android:enabled="true"
         android:icon="@drawable/stroke_style"
-        android:title="Stroke Style"
+        android:title="Style"
         app:showAsAction="always" />
     <item
         android:id="@+id/action_stroke_color"
         android:enabled="true"
         android:icon="@drawable/stroke_color"
-        android:title="Stroke Color"
-        app:showAsAction="ifRoom" />
+        android:title="Ink"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/action_background_color"
         android:enabled="true"
         android:icon="@drawable/background_color"
-        android:title="Background Color"
+        android:title="Background"
         app:showAsAction="always" />
 
     <item

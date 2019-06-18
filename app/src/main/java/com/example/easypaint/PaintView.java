@@ -52,9 +52,12 @@ public class PaintView extends View {
     private ArrayList<Sticker> allStickers = new ArrayList<>();
 
     public void addSticker(Bitmap bitmap) {
-        Sticker sticker = new Sticker(bitmap);
+//        Sticker sticker = new Sticker(bitmap);
+//
+//        allStickers.add(sticker);
 
-        allStickers.add(sticker);
+//        backgroundBitmap = bitmap;
+//        invalidate();
     }
 
     onViewTouchedListener listener;
@@ -193,6 +196,10 @@ public class PaintView extends View {
         return true;
     }
 
+    public Paint.Cap getCapStyle() {
+        return capStyle;
+    }
+
     public Bitmap exportCanvas() {
         return backgroundBitmap;
     }
@@ -235,7 +242,7 @@ public class PaintView extends View {
 
     public void setPaint(Paint mPaint) {
         this.brushPaint = mPaint;
-        invalidate();
+
     }
 
     public int getStrokeColor() {
@@ -252,7 +259,10 @@ public class PaintView extends View {
 
     public void setCapStyle(Paint.Cap capStyle) {
         this.capStyle = capStyle;
-        initPaint();
+        brushPaint.setStrokeCap(capStyle);
+        mBitmapPaint.setStrokeCap(this.capStyle);
+        setPaint(mBitmapPaint);
+
     }
 
     public boolean undoPath() {
